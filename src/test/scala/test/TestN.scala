@@ -1,5 +1,9 @@
+package test
+
+import language.postfixOps
+
 import org.scalatest.FunSuite
-import com.lucho.N._
+import com.lleggieri.N._
 
 class TestN extends FunSuite {
 
@@ -55,16 +59,25 @@ class TestN extends FunSuite {
     //assert(((two + four) hundred) === (six hundred)) cannot do it, ok
   }
 
-  test("implicit") {
-    assert(one.toLong == 1)
-  }
-
   test("sort") {
     assert(one < two)
     assert(four > three)
-    val unsorted = List(three, one, two)
-    val expected = List(one, two, three)
-    //assert(unsorted.sorted === expected)
+    val unsortedN = List(forty two, three, one, one hundred, two, twenty)
+    val expectedN = List(one, two, three, twenty, forty two, one hundred)
+    assert(unsortedN.sorted === expectedN)
+
+    val unsortedE = List(three, one, one hundred, two)
+    val expectedE = List(one, two, three, one hundred)
+    assert(unsortedE.sorted === expectedE)
+
+    val unsortedT = List(forty, twenty, eighty)
+    val expectedT = List(twenty, forty, eighty)
+    assert(unsortedT.sorted === expectedT)
+
+    val unsortedF = List(one + four, two + one, two + zero)
+    val expectedF = List(one + one, one + two, two + three)
+    assert(unsortedF.sorted === expectedF)
+
   }
 
 }

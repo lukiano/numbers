@@ -1,12 +1,15 @@
-package com.lucho
+package com.lleggieri
+
+//import language.implicitConversions
+import language.postfixOps
 
 /**
  * Class N from Number.
  * @param v the long number it represents.
  */
-private[lucho] class N(val v: Long) extends Ordered[N] {
+sealed abstract class N(val v: Long) extends Ordered[N] {
 
-  override def equals(that: Any) = that match {
+  override def equals(that: Any) = that match { //mimicking Value Classes
     case n: N => v == n.v
     case _ => false
   }
@@ -15,7 +18,7 @@ private[lucho] class N(val v: Long) extends Ordered[N] {
 
   override def toString = v.toString
 
-  override def compare(that: N): Int = v.compareTo(that.v)
+  override def compare(that: N): Int = Ordering.Long.compare(v, that.v)
 
   def + (that: N): N with F = new N(v + that.v) with F
   def - (that: N): N with F = new N(v - that.v) with F
@@ -28,12 +31,12 @@ private[lucho] class N(val v: Long) extends Ordered[N] {
 /**
  * HTM from Hundred, Thousand, Million. Adds these extensions to a Number.
  */
-private[lucho] trait HTM { n: N =>
+private[lleggieri] trait HTM { n: N =>
 
   def hundred(t: T): N with T = if (v < 100) new N(v * 100 + toValue(t)) with T else new N((v / 100) * 100 + (v % 100) * 100 + toValue(t)) with T
   def hundred(e: E): N with E = if (v < 100) new N(v * 100 + toValue(e)) with E else new N((v / 100) * 100 + (v % 100) * 100 + toValue(e)) with E
 
-  def hundred(aux: Auxi): N with E = new N((this hundred) * aux.multiplier) with E
+  def hundred(aux: Auxiliary): N with E = new N((this hundred).v * aux.multiplier) with E
 
   def hundred: N with E = if (v < 100) new N(v * 100) with E else new N((v / 100) * 100 + (v % 100) * 100) with E
 
@@ -47,29 +50,31 @@ private[lucho] trait HTM { n: N =>
 
   def million: N with E = new N(v * 1000000) with E
 
-  private def toValue(t: T): Long = N.toLong(t)
-  private def toValue(e: E): Long = N.toLong(e)
+  private def toValue(t: T): Long = t.value
+  private def toValue(e: E): Long = e.value
 
 }
 
 /**
  * F from Final. These Numbers cannot be used with thousand, hundred or million.
  */
-private[lucho] trait F { n: N =>
+private[lleggieri] trait F { n: N =>
 
 }
 
 /**
  * E from Extensible. These Numbers can be used with thousand, hundred or million.
  */
-private[lucho] trait E extends HTM { n: N =>
+private[lleggieri] trait E extends HTM { n: N =>
+
+  private[lleggieri] val value = n.v
 
 }
 
 /**
  * T from Tenth. These Numbers have methods to build Numbers from 21 to 99.
  */
-private[lucho] trait T extends HTM { n: N =>
+private[lleggieri] trait T extends HTM { n: N =>
 
   def one: N = n + N.one
   def two: N = n + N.two
@@ -81,19 +86,25 @@ private[lucho] trait T extends HTM { n: N =>
   def eight: N = n + N.eight
   def nine: N = n + N.nine
 
+  private[lleggieri] val value = n.v
+
 }
 
-private[lucho] abstract sealed class Auxi(private[lucho] val multiplier: Long) {}
-private[lucho] class Thou extends Auxi(1000) {}
-private[lucho] class Mill extends Auxi(1000000) {}
+private[lleggieri] abstract sealed class Auxiliary(private[lleggieri] val multiplier: Long)
+private[lleggieri] final class Thou extends Auxiliary(1000)
+private[lleggieri] final class Mill extends Auxiliary(1000000)
 
 object N {
 
+  implicit def orderingE = new Ordering[N with E] { def compare(x: N with E, y: N with E) = x.compare(y) }
+  implicit def orderingT = new Ordering[N with T] { def compare(x: N with T, y: N with T) = x.compare(y) }
+  implicit def orderingF = new Ordering[N with F] { def compare(x: N with F, y: N with F) = x.compare(y) }
+
+  /*
   @inline implicit def toLong(e: E): Long = e.asInstanceOf[N].v
   @inline implicit def toLong(t: T): Long = t.asInstanceOf[N].v
   @inline implicit def toLong(f: F): Long = f.asInstanceOf[N].v
-
-  //@inline implicit def toN(l: Long) = new N(l) with F
+  */
 
   val zero = new N(0) with F
 

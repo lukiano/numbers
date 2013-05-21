@@ -1,1 +1,9 @@
-This file was created by IntelliJ IDEA 12.1.3 for binding GitHub repository
+Scala Numbers DSL:
+
+Are you tired of writing those positive numbers with 0-9 symbols? Do you even remember the last time you wrote 2 as "two"? If you yearn those times, this library comes to the rescue.
+
+Wanna try it?
+
+- download the project and run "sbt console" to start a Scala REPL.
+- import com.lleggieri.N._
+- have fun!

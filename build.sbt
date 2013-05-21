@@ -1,4 +1,4 @@
-name := "numbers"
+name := "Scala Numbers DSL"
 
 version := "0.1"
 
