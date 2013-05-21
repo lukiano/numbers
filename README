@@ -7,3 +7,33 @@ Wanna try it?
 - download the project and run "sbt console" to start a Scala REPL.
 - import com.lleggieri.N._
 - have fun!
+
+Some examples (taken from the test itself!)
+
+Nice conversion to regular numbers:
+assert(one.v + 1 === 2)
+assert((three million four hundred eleven thousand one hundred twenty three).v === 3411123)
+
+Equality is up to date:
+assert(six === six)
+
+We have operators too!
+assert(one + one === two)
+
+Who can forget our friend Zero?
+assert(zero.v === 0)
+assert(zero === (two - two))
+
+Numbers can be compared...
+assert(one < two)
+assert(four > three)
+
+...sorted...
+val unsortedN = List(forty two, three, one, one hundred, two, twenty)
+val expectedN = List(one, two, three, twenty, forty two, one hundred)
+assert(unsortedN.sorted === expectedN)
+
+...and used in ranges
+val list = one to ten
+assert(list.length === 10)
+assert(list.contains(seven))
