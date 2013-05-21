@@ -1,7 +1,10 @@
 package com.lleggieri
 
-//import language.implicitConversions
+import language.implicitConversions
 import language.postfixOps
+
+import scala.runtime.IntegralProxy
+import scala.math.Integral
 
 /**
  * Class N from Number.
@@ -9,12 +12,14 @@ import language.postfixOps
  */
 sealed abstract class N(val v: Long) extends Ordered[N] {
 
-  override def equals(that: Any) = that match { //mimicking Value Classes
+  //mimicking Value Classes
+  override def equals(that: Any) = that match {
     case n: N => v == n.v
     case _ => false
   }
 
-  override def hashCode() = if (v >= Int.MinValue && v <= Int.MaxValue) v.toInt else v.## //copied from ScalaNumericConversions
+  //copied from ScalaNumericConversions
+  override def hashCode() = if (v >= Int.MinValue && v <= Int.MaxValue) v.toInt else v.##
 
   override def toString = v.toString
 
@@ -57,6 +62,8 @@ private[lleggieri] trait HTM { n: N =>
 
 /**
  * F from Final. These Numbers cannot be used with thousand, hundred or million.
+ * They are built using operators (+ - ...) and zero.
+ * Because we don't like "one hundred zero" or "(one + two) hundred)
  */
 private[lleggieri] trait F { n: N =>
 
@@ -72,7 +79,7 @@ private[lleggieri] trait E extends HTM { n: N =>
 }
 
 /**
- * T from Tenth. These Numbers have methods to build Numbers from 21 to 99.
+ * T from Tenth. These Numbers have methods to build Numbers from 21 to 99. Ex: forty two.
  */
 private[lleggieri] trait T extends HTM { n: N =>
 
@@ -90,15 +97,58 @@ private[lleggieri] trait T extends HTM { n: N =>
 
 }
 
+/**
+ * These auxiliary classes help building numbers like "one hundred thousand" or "two hundred million"
+ * @param multiplier the number this auxiliary multiplies to.
+ */
 private[lleggieri] abstract sealed class Auxiliary(private[lleggieri] val multiplier: Long)
 private[lleggieri] final class Thou extends Auxiliary(1000)
 private[lleggieri] final class Mill extends Auxiliary(1000000)
 
+/**
+ *
+ * @param self because only a N can become rich.
+ */
+final class RichN(val self: N) extends IntegralProxy[N] {
+
+  //All this stuff is adapted from RichLong
+  protected def num = new Integral[N] {
+    def plus(x: N, y: N): N = x + y
+    def minus(x: N, y: N): N = x - y
+    def times(x: N, y: N): N = x * y
+    def quot(x: N, y: N): N = x / y
+    def rem(x: N, y: N): N = x % y
+    def negate(x: N): N = new N(-x.v) with F
+    def fromInt(x: Int): N = new N(x) with F
+    def toInt(x: N): Int = x.v.toInt
+    def toLong(x: N): Long = x.v
+    def toN(x: N): N = x
+    def toFloat(x: N): Float = x.v
+    def toDouble(x: N): Double = x.v
+    def compare(x: N, y: N): Int = x.compare(y)
+  }
+
+  protected def ord = Ordering.ordered[N]
+
+  override def isValidByte = self.v.toByte.toLong == self.v
+  override def isValidShort = self.v.toShort.toLong == self.v
+  override def isValidChar = self.v.toChar.toLong == self.v
+  override def isValidInt = self.v.toInt.toLong == self.v
+
+}
+
+/**
+ * The companion class were all constants are defined
+ */
 object N {
 
-  implicit def orderingE = new Ordering[N with E] { def compare(x: N with E, y: N with E) = x.compare(y) }
-  implicit def orderingT = new Ordering[N with T] { def compare(x: N with T, y: N with T) = x.compare(y) }
-  implicit def orderingF = new Ordering[N with F] { def compare(x: N with F, y: N with F) = x.compare(y) }
+  /*
+   Ordered[N] deals with sorting a mix of numbers, and these implicits deals when all the values to be sorted
+   belong to a particular subclass (really, classes with a particular trait).
+   */
+  implicit val orderingE = new Ordering[N with E] { def compare(x: N with E, y: N with E) = x.compare(y) }
+  implicit val orderingT = new Ordering[N with T] { def compare(x: N with T, y: N with T) = x.compare(y) }
+  implicit val orderingF = new Ordering[N with F] { def compare(x: N with F, y: N with F) = x.compare(y) }
 
   /*
   @inline implicit def toLong(e: E): Long = e.asInstanceOf[N].v
@@ -141,4 +191,6 @@ object N {
   val thousand = new Thou
   val million = new Mill
 
+  //yeah, we are rich too
+  @inline implicit def nWrapper(n: N): RichN = new RichN(n)
 }

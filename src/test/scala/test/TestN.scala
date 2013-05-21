@@ -80,4 +80,26 @@ class TestN extends FunSuite {
 
   }
 
+  test("wealth") {
+    val list = 1l to 10
+    assert(list.length === 10)
+
+    val list2 = one to ten
+    assert(list2.length === 10)
+
+    val list3 = one until twenty
+    assert(list3.length === 19)
+
+    //we need parenthesis here
+    val list4 = one to (forty two)
+    assert(list4.length === 42)
+
+    val list5 = (twenty three) to ninety
+    assert(!list5.contains(42)) //no numeric numbers here
+    assert(list5.contains(forty two))
+
+    val set1 = Set(one, two, three)
+    assert(set1.contains(three))
+  }
+
 }
