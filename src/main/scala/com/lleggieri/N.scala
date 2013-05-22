@@ -3,14 +3,11 @@ package com.lleggieri
 import language.implicitConversions
 import language.postfixOps
 
-import scala.runtime.IntegralProxy
-import scala.math.Integral
-
 /**
  * Class N from Number.
  * @param v the long number it represents.
  */
-sealed abstract class N(val v: Long) extends Ordered[N] {
+abstract class N(val v: Long) extends OrderedN {
 
   //mimicking Value Classes
   override def equals(that: Any) = that match {
@@ -23,118 +20,6 @@ sealed abstract class N(val v: Long) extends Ordered[N] {
 
   override def toString = v.toString
 
-  override def compare(that: N): Int = Ordering.Long.compare(v, that.v)
-
-  def + (that: N): N with F = new N(v + that.v) with F
-  def - (that: N): N with F = new N(v - that.v) with F
-  def * (that: N): N with F = new N(v * that.v) with F
-  def / (that: N): N with F = new N(v / that.v) with F
-  def % (that: N): N with F = new N(v % that.v) with F
-
-}
-
-/**
- * HTM from Hundred, Thousand, Million. Adds these extensions to a Number.
- */
-private[lleggieri] trait HTM { n: N =>
-
-  def hundred(t: T): N with T = if (v < 100) new N(v * 100 + toValue(t)) with T else new N((v / 100) * 100 + (v % 100) * 100 + toValue(t)) with T
-  def hundred(e: E): N with E = if (v < 100) new N(v * 100 + toValue(e)) with E else new N((v / 100) * 100 + (v % 100) * 100 + toValue(e)) with E
-
-  def hundred(aux: Auxiliary): N with E = new N((this hundred).v * aux.multiplier) with E
-
-  def hundred: N with E = if (v < 100) new N(v * 100) with E else new N((v / 100) * 100 + (v % 100) * 100) with E
-
-  def thousand(t: T): N with T = if (v < 1000) new N(v * 1000 + toValue(t)) with T else new N((v / 1000) * 1000 + (v % 1000) * 1000 + toValue(t)) with T
-  def thousand(e: E): N with E = if (v < 1000) new N(v * 1000 + toValue(e)) with E else new N((v / 1000) * 1000 + (v % 1000) * 1000 + toValue(e)) with E
-
-  def thousand: N with E = if (v < 1000) new N(v * 1000) with E else new N((v / 1000) * 1000 + (v % 1000) * 1000) with E
-
-  def million(t: T): N with T = new N(v * 1000000 + toValue(t)) with T
-  def million(e: E): N with E = new N(v * 1000000 + toValue(e)) with E
-
-  def million: N with E = new N(v * 1000000) with E
-
-  private def toValue(t: T): Long = t.value
-  private def toValue(e: E): Long = e.value
-
-}
-
-/**
- * F from Final. These Numbers cannot be used with thousand, hundred or million.
- * They are built using operators (+ - ...) and zero.
- * Because we don't like "one hundred zero" or "(one + two) hundred)
- */
-private[lleggieri] trait F { n: N =>
-
-}
-
-/**
- * E from Extensible. These Numbers can be used with thousand, hundred or million.
- */
-private[lleggieri] trait E extends HTM { n: N =>
-
-  private[lleggieri] val value = n.v
-
-}
-
-/**
- * T from Tenth. These Numbers have methods to build Numbers from 21 to 99. Ex: forty two.
- */
-private[lleggieri] trait T extends HTM { n: N =>
-
-  def one: N = n + N.one
-  def two: N = n + N.two
-  def three: N = n + N.three
-  def four: N = n + N.four
-  def five: N = n + N.five
-  def six: N = n + N.six
-  def seven: N = n + N.seven
-  def eight: N = n + N.eight
-  def nine: N = n + N.nine
-
-  private[lleggieri] val value = n.v
-
-}
-
-/**
- * These auxiliary classes help building numbers like "one hundred thousand" or "two hundred million"
- * @param multiplier the number this auxiliary multiplies to.
- */
-private[lleggieri] abstract sealed class Auxiliary(private[lleggieri] val multiplier: Long)
-private[lleggieri] final class Thou extends Auxiliary(1000)
-private[lleggieri] final class Mill extends Auxiliary(1000000)
-
-/**
- *
- * @param self because only a N can become rich.
- */
-final class RichN(val self: N) extends IntegralProxy[N] {
-
-  //All this stuff is adapted from RichLong
-  protected def num = new Integral[N] {
-    def plus(x: N, y: N): N = x + y
-    def minus(x: N, y: N): N = x - y
-    def times(x: N, y: N): N = x * y
-    def quot(x: N, y: N): N = x / y
-    def rem(x: N, y: N): N = x % y
-    def negate(x: N): N = new N(-x.v) with F
-    def fromInt(x: Int): N = new N(x) with F
-    def toInt(x: N): Int = x.v.toInt
-    def toLong(x: N): Long = x.v
-    def toN(x: N): N = x
-    def toFloat(x: N): Float = x.v
-    def toDouble(x: N): Double = x.v
-    def compare(x: N, y: N): Int = x.compare(y)
-  }
-
-  protected def ord = Ordering.ordered[N]
-
-  override def isValidByte = self.v.toByte.toLong == self.v
-  override def isValidShort = self.v.toShort.toLong == self.v
-  override def isValidChar = self.v.toChar.toLong == self.v
-  override def isValidInt = self.v.toInt.toLong == self.v
-
 }
 
 /**
@@ -146,9 +31,9 @@ object N {
    Ordered[N] deals with sorting a mix of numbers, and these implicits deals when all the values to be sorted
    belong to a particular subclass (really, classes with a particular trait).
    */
-  implicit val orderingE = new Ordering[N with E] { def compare(x: N with E, y: N with E) = x.compare(y) }
-  implicit val orderingT = new Ordering[N with T] { def compare(x: N with T, y: N with T) = x.compare(y) }
-  implicit val orderingF = new Ordering[N with F] { def compare(x: N with F, y: N with F) = x.compare(y) }
+  implicit val orderingE = new Ordering[N with HTM] { def compare(x: N with HTM, y: N with HTM) = x.compare(y) }
+  implicit val orderingT = new Ordering[N with Tenth] { def compare(x: N with Tenth, y: N with Tenth) = x.compare(y) }
+  implicit val orderingF = new Ordering[N with Final] { def compare(x: N with Final, y: N with Final) = x.compare(y) }
 
   /*
   @inline implicit def toLong(e: E): Long = e.asInstanceOf[N].v
@@ -156,37 +41,37 @@ object N {
   @inline implicit def toLong(f: F): Long = f.asInstanceOf[N].v
   */
 
-  val zero = new N(0) with F
+  val zero = new N(0) with Final
 
-  val one = new N(1) with E
-  val two = new N(2) with E
-  val three = new N(3) with E
-  val four = new N(4) with E
-  val five = new N(5) with E
-  val six = new N(6) with E
-  val seven = new N(7) with E
-  val eight = new N(8) with E
-  val nine = new N(9) with E
+  val one = new N(1) with HTM
+  val two = new N(2) with HTM
+  val three = new N(3) with HTM
+  val four = new N(4) with HTM
+  val five = new N(5) with HTM
+  val six = new N(6) with HTM
+  val seven = new N(7) with HTM
+  val eight = new N(8) with HTM
+  val nine = new N(9) with HTM
 
-  val ten = new N(10) with E
-  val eleven = new N(11) with E
-  val twelve = new N(12) with E
-  val thirteen = new N(13) with E
-  val fourteen = new N(14) with E
-  val fifteen = new N(15) with E
-  val sixteen = new N(16) with E
-  val seventeen = new N(17) with E
-  val eighteen = new N(18) with E
-  val nineteen = new N(19) with E
+  val ten = new N(10) with HTM
+  val eleven = new N(11) with HTM
+  val twelve = new N(12) with HTM
+  val thirteen = new N(13) with HTM
+  val fourteen = new N(14) with HTM
+  val fifteen = new N(15) with HTM
+  val sixteen = new N(16) with HTM
+  val seventeen = new N(17) with HTM
+  val eighteen = new N(18) with HTM
+  val nineteen = new N(19) with HTM
 
-  val twenty = new N(20) with T
-  val thirty = new N(30) with T
-  val forty = new N(40) with T
-  val fifty = new N(50) with T
-  val sixty = new N(60) with T
-  val seventy = new N(70) with T
-  val eighty = new N(80) with T
-  val ninety = new N(90) with T
+  val twenty = new N(20) with Tenth
+  val thirty = new N(30) with Tenth
+  val forty = new N(40) with Tenth
+  val fifty = new N(50) with Tenth
+  val sixty = new N(60) with Tenth
+  val seventy = new N(70) with Tenth
+  val eighty = new N(80) with Tenth
+  val ninety = new N(90) with Tenth
 
   val thousand = new Thou
   val million = new Mill
