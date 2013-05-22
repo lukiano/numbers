@@ -97,7 +97,7 @@ class TestN extends FunSuite {
     val list5 = (twenty three) to ninety
     assert(!list5.contains(42)) //no numeric numbers here
     assert(list5.contains(forty two))
-    two hundred three hundred
+    two million three million
     two thousand three thousand
     val set1 = Set(one, two, three)
     assert(set1.contains(three))
