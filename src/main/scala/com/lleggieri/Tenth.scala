@@ -3,7 +3,7 @@ package com.lleggieri
 /**
  * These Numbers have methods to build Numbers from 21 to 99. Ex: forty two.
  */
-private[lleggieri] trait Tenth extends Hundred with Thousand with Million { n: N =>
+private[lleggieri] trait Tenth { n: N =>
 
   def one: N = n + N.one
   def two: N = n + N.two

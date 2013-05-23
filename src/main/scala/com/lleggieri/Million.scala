@@ -5,9 +5,9 @@ package com.lleggieri
  */
 private[lleggieri] trait Million { n: N =>
 
-  def million(t: Tenth): N with Tenth = new N(v * 1000000 + t.value) with Tenth
-  def million(e: HTM): N with HTM = new N(v * 1000000 + e.value) with HTM
+  def million(t: Tenth): N with Tenth with HundredBeforeThousand with Thousand = new N(v * 1000000 + t.value) with Tenth with HundredBeforeThousand with Thousand
+  def million(e: Extensible): N with HundredBeforeThousand with Thousand = new N(v * 1000000 + e.value) with HundredBeforeThousand with Thousand
 
-  def million: N with HTM = new N(v * 1000000) with HTM
+  def million: N with HundredBeforeThousand with Thousand = new N(v * 1000000) with HundredBeforeThousand with Thousand
 
 }
