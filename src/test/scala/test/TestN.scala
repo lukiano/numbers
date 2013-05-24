@@ -55,6 +55,14 @@ class TestN extends FunSuite {
     //val x2 = (one thousand hundred) cannot do it, ok
     assert((one hundred thousand).v === 100000)
     assert((one hundred million).v === 100000000)
+    assert((one thousand one hundred).v === 1100)
+    assert((one thousand one hundred one).v === 1101)
+    assert((one million one hundred).v === 1000100)
+    assert((one million one hundred one).v === 1000101)
+    assert((one million one thousand).v === 1001000)
+    assert((one million one hundred thousand).v === 1100000)
+    //assert((one thousand one hundred thousand).v === 100000) cannot do it, ok
+    //assert((one thousand one hundred million).v === 100000) cannot do it, ok
     //assert((one hundred zero).v === 100000000) cannot do it, ok
     //assert(((two + four) hundred) === (six hundred)) cannot do it, ok
   }
@@ -97,9 +105,9 @@ class TestN extends FunSuite {
     val list5 = (twenty three) to ninety
     assert(!list5.contains(42)) //no numeric numbers here
     assert(list5.contains(forty two))
-    //two million three million
-    //two thousand three thousand
-    //one hundred one hundred
+    //two million three million | cannot do it, ok
+    //two thousand three thousand | cannot do it, ok
+    //one hundred one hundred | cannot do it, ok
     val set1 = Set(one, two, three)
     assert(set1.contains(three))
   }

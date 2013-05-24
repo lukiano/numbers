@@ -73,8 +73,8 @@ object N {
   val eighty = new N(80) with Tenth
   val ninety = new N(90) with Tenth
 
-  val thousand = new Thou
-  val million = new Mill
+  val thousand = new Thou[Million] with Auxiliary[Thousand]
+  val million = new Mill[Million]
 
   //yeah, we are rich too
   @inline implicit def nWrapper(n: N): RichN = new RichN(n)
