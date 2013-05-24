@@ -5,15 +5,15 @@ package com.lleggieri
  */
 private[lleggieri] trait Tenth { n: N =>
 
-  def one: N = n + N.one
-  def two: N = n + N.two
-  def three: N = n + N.three
-  def four: N = n + N.four
-  def five: N = n + N.five
-  def six: N = n + N.six
-  def seven: N = n + N.seven
-  def eight: N = n + N.eight
-  def nine: N = n + N.nine
+  def one = n + N.one
+  def two = n + N.two
+  def three = n + N.three
+  def four = n + N.four
+  def five = n + N.five
+  def six = n + N.six
+  def seven = n + N.seven
+  def eight = n + N.eight
+  def nine = n + N.nine
 
   private[lleggieri] val value = n.v
 

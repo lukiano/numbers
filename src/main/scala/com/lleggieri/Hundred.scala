@@ -5,21 +5,18 @@ package com.lleggieri
  */
 private[lleggieri] trait Hundred[A] { n: N =>
 
-  private def calc(add: Long) = if (v < 100) (v * 100 + add) else ((v / 100) * 100 + (v % 100) * 100 + add)
+  private def calc(add: Long) = compute(v, 100, add)
 
-  def hundred(t: Tenth)(implicit ev: Hundred.HundredLike[A]): N with A with Tenth = ev.newNWithTenth(calc(t.value))
-  def hundred(e: Extensible)(implicit ev: Hundred.HundredLike[A]): N with A = ev.newN(calc(e.value))
+  def hundred(t: Tenth)(implicit ev: Hundred.HundredLike[A]) = ev.newNWithTenth(calc(t.value))
+  def hundred(e: Extensible)(implicit ev: Hundred.HundredLike[A]) = ev.newN(calc(e.value))
 
-  def hundred: N with Final = new N(calc(0)) with Final
+  def hundred = new N(calc(0)) with Final
 
-  private def calcWithMultiplier(multiplier: Long) = {
-    val guard = 100 * multiplier
-    if (v < guard) (v * guard) else ((v / guard) * guard + (v % guard) * guard)
-  }
+  private def calcWithMultiplier(multiplier: Long) = compute(v, 100 * multiplier, 0)
 
-  def hundred(aux: Auxiliary[A])(implicit ev: Hundred.HundredLike[A]): N with A = ev.newN(calcWithMultiplier(aux.multiplier))
-  def hundred(aux: Thou[A])(implicit ev: Hundred.HundredLike[A]): N with A = ev.newN(calcWithMultiplier(aux.multiplier))
-  def hundred(aux: Mill[A])(implicit ev: Hundred.HundredLike[A]): N with A = ev.newN(calcWithMultiplier(aux.multiplier))
+  def hundred(aux: Auxiliary[A])(implicit ev: Hundred.HundredLike[A]) = ev.newN(calcWithMultiplier(aux.multiplier))
+  def hundred(aux: Thou[A])(implicit ev: Hundred.HundredLike[A]) = ev.newN(calcWithMultiplier(aux.multiplier))
+  def hundred(aux: Mill[A])(implicit ev: Hundred.HundredLike[A]) = ev.newN(calcWithMultiplier(aux.multiplier))
 
 }
 

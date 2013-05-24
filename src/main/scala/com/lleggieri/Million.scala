@@ -5,9 +5,11 @@ package com.lleggieri
  */
 private[lleggieri] trait Million { n: N =>
 
-  def million(t: Tenth): N with Tenth with Hundred[Thousand] with Thousand = new N(v * 1000000 + t.value) with Tenth with Hundred[Thousand] with Thousand
-  def million(e: Extensible): N with Hundred[Thousand] with Thousand = new N(v * 1000000 + e.value) with Hundred[Thousand] with Thousand
+  private def calc(add: Long) = compute(v, 1000000, add)
 
-  def million: N with Hundred[Thousand]with Thousand = new N(v * 1000000) with Hundred[Thousand] with Thousand
+  def million(t: Tenth) = new N(calc(t.value)) with Tenth with Hundred[Thousand] with Thousand
+  def million(e: Extensible) = new N(calc(e.value)) with Hundred[Thousand] with Thousand
+
+  def million = new N(calc(0)) with Hundred[Thousand] with Thousand
 
 }

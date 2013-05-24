@@ -5,10 +5,12 @@ package com.lleggieri
  */
 private[lleggieri] trait Thousand { n: N =>
 
-  def thousand(t: Tenth): N with Tenth with Hundred[Final] = new N(if (v < 1000) (v * 1000 + t.value) else ((v / 1000) * 1000 + (v % 1000) * 1000 + t.value)) with Tenth with Hundred[Final]
-  def thousand(e: Extensible): N with Hundred[Final] = new N(if (v < 1000) (v * 1000 + e.value) else ((v / 1000) * 1000 + (v % 1000) * 1000 + e.value)) with Hundred[Final]
+  private def calc(add: Long) = compute(v, 1000, add)
 
-  def thousand: N with Hundred[Final] = new N(if (v < 1000) (v * 1000) else ((v / 1000) * 1000 + (v % 1000) * 1000)) with Hundred[Final]
+  def thousand(t: Tenth) = new N(calc(t.value)) with Tenth with Hundred[Final]
+  def thousand(e: Extensible) = new N(calc(e.value)) with Hundred[Final]
+
+  def thousand = new N(calc(0)) with Hundred[Final]
 
 }
 
