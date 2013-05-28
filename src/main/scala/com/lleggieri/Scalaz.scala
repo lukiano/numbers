@@ -11,6 +11,6 @@ object Scalaz {
 
   }
 
-  implicit val monoid = new N_Monoid
+  implicit val additiveMonoid = new N_Monoid
 
 }

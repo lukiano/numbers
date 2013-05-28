@@ -120,8 +120,9 @@ class TestN extends FunSuite {
     import spire.implicits._ // provides infix operators, instances and conversions
     val n1 = one
     val n2 = twenty
-    println ("Spire " + (n1 |+| n2))
-    println ("Spire " + (n1 + n2))
+    val result = n1 |+| n2
+    assert ((twenty one) == result)
+
   }
 
   test("scalaz") {
@@ -131,6 +132,12 @@ class TestN extends FunSuite {
     val n1:N = one
     val n2:N = twenty
     println ("Scalaz " + (n1 |+| n2))
+    import scalaz.std.list._
+    import scalaz.syntax.foldable._
+    val list: List[N] = List(one, two, three, four)
+    val result = list.suml
+    val expected:N = ten
+    assert(expected == result)
 
   }
 }
