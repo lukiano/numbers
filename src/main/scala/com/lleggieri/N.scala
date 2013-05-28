@@ -2,6 +2,7 @@ package com.lleggieri
 
 import language.implicitConversions
 import language.postfixOps
+import scala.Ordering
 
 /**
  * Class N from Number.
@@ -34,6 +35,8 @@ object N {
   implicit val orderingE = new Ordering[N with Extensible] { def compare(x: N with Extensible, y: N with Extensible) = x.compare(y) }
   implicit val orderingT = new Ordering[N with Tenth] { def compare(x: N with Tenth, y: N with Tenth) = x.compare(y) }
   implicit val orderingF = new Ordering[N with Final] { def compare(x: N with Final, y: N with Final) = x.compare(y) }
+
+  @inline implicit def finalWrapper(n: N with Extensible): N with Final = new N(n.value) with Final
 
   /*
   @inline implicit def toLong(e: E): Long = e.asInstanceOf[N].v
@@ -78,4 +81,5 @@ object N {
 
   //yeah, we are rich too
   @inline implicit def nWrapper(n: N): RichN = new RichN(n)
+
 }

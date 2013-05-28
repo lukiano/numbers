@@ -4,6 +4,7 @@ import language.postfixOps
 
 import org.scalatest.FunSuite
 import com.lleggieri.N._
+import com.lleggieri.N
 
 class TestN extends FunSuite {
 
@@ -112,4 +113,24 @@ class TestN extends FunSuite {
     assert(set1.contains(three))
   }
 
+  test("spire") {
+    //import spire.algebra._   // provides algebraic type classes
+    //import spire.math._      // provides functions, types, and type classes
+    import com.lleggieri.Spire._
+    import spire.implicits._ // provides infix operators, instances and conversions
+    val n1 = one
+    val n2 = twenty
+    println ("Spire " + (n1 |+| n2))
+    println ("Spire " + (n1 + n2))
+  }
+
+  test("scalaz") {
+    import com.lleggieri.Scalaz._
+    import scalaz._
+    import scalaz.Scalaz._
+    val n1:N = one
+    val n2:N = twenty
+    println ("Scalaz " + (n1 |+| n2))
+
+  }
 }
