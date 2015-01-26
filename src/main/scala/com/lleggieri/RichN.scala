@@ -7,10 +7,10 @@ import scala.math.Integral
  *
  * @param self because only an N can become rich.
  */
-final class RichN(val self: N) extends IntegralProxy[N] {
+final class RichN(val self: N) extends AnyVal with IntegralProxy[N] {
 
   //All this stuff is adapted from RichLong
-  protected def num = new Integral[N] {
+  protected override def num = new Integral[N] {
     def plus(x: N, y: N) = x + y
     def minus(x: N, y: N) = x - y
     def times(x: N, y: N) = x * y
@@ -26,7 +26,7 @@ final class RichN(val self: N) extends IntegralProxy[N] {
     def compare(x: N, y: N) = x.compare(y)
   }
 
-  protected def ord = Ordering.ordered[N]
+  protected override def ord = Ordering.ordered[N]
 
   override def isValidByte = self.v.toByte.toLong == self.v
   override def isValidShort = self.v.toShort.toLong == self.v
