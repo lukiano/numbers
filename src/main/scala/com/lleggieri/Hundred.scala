@@ -10,7 +10,7 @@ private[lleggieri] trait Hundred[A] { n: N =>
   def hundred(t: Tenth)(implicit ev: Hundred.HundredLike[A]) = ev.newNWithTenth(calc(t.value))
   def hundred(e: Extensible)(implicit ev: Hundred.HundredLike[A]) = ev.newN(calc(e.value))
 
-  def hundred = new N(calc(0)) with Final
+  def hundred = N.cons(calc(0))
 
   private def calcWithMultiplier(multiplier: Long) = compute(v, 100 * multiplier, 0)
 

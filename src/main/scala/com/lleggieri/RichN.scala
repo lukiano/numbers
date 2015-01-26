@@ -16,8 +16,8 @@ final class RichN(val self: N) extends AnyVal with IntegralProxy[N] {
     def times(x: N, y: N) = x * y
     def quot(x: N, y: N) = x / y
     def rem(x: N, y: N) = x % y
-    def negate(x: N) = new N(-x.v) with Final
-    def fromInt(x: Int) = new N(x) with Final
+    def negate(x: N) = N.cons(-x.v)
+    def fromInt(x: Int) = N.cons(x)
     def toInt(x: N) = x.v.toInt
     def toLong(x: N) = x.v
     def toN(x: N) = x

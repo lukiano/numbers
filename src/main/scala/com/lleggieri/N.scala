@@ -7,7 +7,7 @@ import language.postfixOps
  * Class N from Number.
  * @param v the long number it represents.
  */
-abstract class N(val v: Long) extends OrderedN {
+abstract class N private[lleggieri] (val v: Long) extends OrderedN {
 
   //mimicking Value Classes
   override def equals(that: Any) = that match {
@@ -41,7 +41,7 @@ object N {
   @inline implicit def toLong(f: F): Long = f.asInstanceOf[N].v
   */
 
-  val zero = new N(0) with Final
+  val zero = cons(0)
 
   val one = new N(1) with Extensible
   val two = new N(2) with Extensible
@@ -78,4 +78,9 @@ object N {
 
   //yeah, we are rich too
   @inline implicit def nWrapper(n: N): RichN = new RichN(n)
+
+  val MaxValue = cons(Long.MaxValue)
+  val MinValue = cons(Long.MinValue)
+
+  private [lleggieri] def cons(n: Long): N with Final = new N(n) with Final
 }
